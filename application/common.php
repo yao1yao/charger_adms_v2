@@ -10,3 +10,21 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
+
+
+/**
+ * 通用的分页样式
+ * @param $obj
+ * @return string
+ */
+function pagniation($obj)
+{
+
+    if (!$obj) {
+        return '';
+    }
+    //优化方案
+    $params = request()->param();
+    return '<div class="cl pd-5 bg-1 bk-gray  tp5-charger">' . $obj->appends($params)->render() . '</div>';
+
+}
