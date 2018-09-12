@@ -8,10 +8,15 @@ use think\Cache;
 use think\Controller;
 
 class Createorder extends Controller{
+    private $UserRecrgeRecordModel;
+    public function _initialize()
+    {
+        $this->UserRecrgeRecordModel=model('UserRechargeRecord');
+    }
     public function command(UserInfoValidate $validate)
     {
         $data = $validate->goCheck('createOrder');
-        $jssdkOrder = UserRechargeRecord::createOrder();
-        return 123;
+        $jssdkOrder = $this->UserRecrgeRecordModel->createOrder($data);
+        return json($jssdkOrder);
     }
 }

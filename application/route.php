@@ -11,6 +11,7 @@
 use think\Route;
 // app 接口路由
 Route::post('v1/orders','api/app_v1.createorder/command');
+Route::post('wechat/pay-push','api/app_v1.wechat/payPush');
 
 
 // adms 接口路由
