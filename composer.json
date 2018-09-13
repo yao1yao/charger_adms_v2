@@ -40,6 +40,14 @@
         "preferred-install": "dist"
     },
     "scripts":{
-        "cm": "script/init_sql.sh script/EV_user_info.sql"
+        "cm1": "scripts/init_sql.sh scripts/table/user_recharge_record.sql",
+        "cb1": "scripts/create_table.sh scripts/table/user_recharge_record.sql",
+        "natapp": "nohup natapp -authtoken=dce612355b6e8926 -log=stdout &",
+        "findnat": "ps -ef|grep natapp",
+        "killnat": "kill -9 pid",
+        "ngreload": "sudo nginx -s reload",
+        "ngrestart": "sudo brew services restart nginx",
+        "stphpfpm": "sudo php-fpm -y /usr/local/etc/php/7.1/php-fpm.conf",
+        "ngconf":"pstorm /usr/local/etc/nginx/nginx.conf"
     }
 }
