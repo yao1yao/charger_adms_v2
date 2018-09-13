@@ -17,6 +17,6 @@ class Createorder extends Controller{
     {
         $data = $validate->goCheck('createOrder');
         $jssdkOrder = $this->UserRecrgeRecordModel->createOrder($data);
-        return json($jssdkOrder);
+        return respSuccess($jssdkOrder);
     }
 }

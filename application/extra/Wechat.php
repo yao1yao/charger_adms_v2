@@ -32,7 +32,7 @@ return [
         'notify_url'=> 'http://charger.natapp1.cc/wechat/pay-push',
         'oauth' => [
             'scopes'   => ['snsapi_base'],
-            'callback' => "http://charger.atu360.cn/api/v1.oauthcallback/command",
+            'callback' => "wechat/oauth-callback",
         ],
         //模板 id 配置,该配置不属于 easywechat 但可以放入其中
         'template_id' => [
