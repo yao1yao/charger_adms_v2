@@ -14,18 +14,13 @@ function respSuccess($data=[]){
         'respCode'=>100
     ]));
 }
-//创建 token
-function createToken($phone,$passsword)
-{
-    $token = md5($phone.$passsword);
 
-    return $token;
-}
-function chargerBack($respCode,$message,$data=[]){
-    return [
+// api 返回返回
+function chargerBack($respCode,$data=[]){
+    return json([
         'respCode'=>intval($respCode),
-        'errMsg'=>$message,
         'data'=>$data,
-    ];
+    ]);
 }
+
 
