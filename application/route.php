@@ -11,6 +11,7 @@
 use think\Route;
 // app 接口路由
 Route::post('v1/orders','api/app_v1.createorder/command');
+Route::post('v1/login','api/app_v1.login/command');
 
 // 微信路由
 Route::any('wechat/pay-push','api/app_v1.wechat/paypush');
@@ -18,6 +19,5 @@ Route::any('wechat/oauth-callback','api/app_v1.wechat/oauthcallback');
 Route::any('app-entrance','api/app_v1.wechat/command');
 Route::any('menus','api/app_v1.wechat/createmenu');
 Route::get('wechat/jssdk','api/app_v1.wechat/getjssdk');
-
 
 // adms 接口路由
