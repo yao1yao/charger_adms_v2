@@ -17,6 +17,7 @@ Route::any('wechat/pay-push','api/app_v1.wechat/paypush');
 Route::any('wechat/oauth-callback','api/app_v1.wechat/oauthcallback');
 Route::any('app-entrance','api/app_v1.wechat/command');
 Route::any('menus','api/app_v1.wechat/createmenu');
+Route::get('wechat/jssdk','api/app_v1.wechat/getjssdk');
 
 
 // adms 接口路由
