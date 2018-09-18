@@ -12,6 +12,8 @@ use think\Route;
 // app 接口路由
 Route::post('v1/orders','api/app_v1.createorder/command');
 Route::post('v1/login','api/app_v1.login/command');
+Route::post('v1/register','api/app_v1.register/command');
+Route::get('v1/verfcode','api/app_v1.getverfcode/command');
 
 // 微信路由
 Route::any('wechat/pay-push','api/app_v1.wechat/paypush');

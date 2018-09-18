@@ -12,18 +12,14 @@ namespace app\api\controller\app_v1;
 use app\api\validate\UserInfoValidate;
 use think\Controller;
 
-class Login extends Controller
+class Login extends BaseController
 {
-    public function _initialize()
-    {
-        $this->UserInfo=model('UserInfo');
-    }
     public function command(){
-        $data = (new UserInfoValidate())->goCheck('login');
+        $data = $this->UserInfoValidate->goCheck('login');
         // 判断用户是否合法
-        $this->UserInfo->checkUser($data['phone'],$data['password']);
+        $this->UserInfoModel->checkUser($data['phone'],$data['password']);
         // 生成登录信息
-        $data = $this->UserInfo->createLoginInfo($data['phone']);
+        $data = $this->UserInfoModel->createLoginInfo($data['phone']);
         // 返回给前端
         return chargerBack(100,$data);
     }

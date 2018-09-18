@@ -7,16 +7,12 @@ use app\common\model\UserRechargeRecord;
 use think\Cache;
 use think\Controller;
 
-class Createorder extends Controller{
-    private $UserRecrgeRecordModel;
-    public function _initialize()
+class Createorder extends BaseController
+{
+    public function command()
     {
-        $this->UserRecrgeRecordModel=model('UserRechargeRecord');
-    }
-    public function command(UserInfoValidate $validate)
-    {
-        $data = $validate->goCheck('createOrder');
-        $jssdkOrder = $this->UserRecrgeRecordModel->createOrder($data);
+        $data = $this->UserInfoValidate->goCheck('createOrder');
+        $jssdkOrder = $this->UserRechargeRecordModel->createOrder($data);
         return respSuccess($jssdkOrder);
     }
 }
