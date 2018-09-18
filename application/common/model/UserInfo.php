@@ -12,22 +12,53 @@ namespace app\common\model;
 use app\api\service\Token;
 use app\lib\exception\NotFoundException;
 use app\lib\exception\UserInfoException;
+use app\lib\exception\VerfCodeException;
 use think\Cache;
+use think\exception\ValidateException;
 use think\Model;
 
 class UserInfo extends Model
 {
+    protected $createTime = 'register_date';
+    protected $updateTime = 'login_date';
     // 检查登录用户是否合法
     public  function  checkUser($phone, $password)
     {
         $userInfo=$this->get(['phone'=>$phone]);
         if(!$userInfo){
-            throw new UserInfoException();
+            throw new UserInfoException([
+                'errMsg'=>'用户不存在',
+                'respCode'=>40001
+            ]);
         }
         if(!password_verify($password,$userInfo['password'])){
             throw new UserInfoException([
                 'errMsg'=>'密码不正确',
                 'respCode' => 40002
+            ]);
+        }
+    }
+    // 注册时，检查用户信息是否已注册, 验证码是否正确
+    public function checkUserInfo($phone,$userName,$verCode){
+        $result = $this->get(['phone'=>$phone]);
+        if($result){
+            throw new UserInfoException([
+                "errMsg"=>"号码已注册",
+                "respCode"=>"40003"
+            ]);
+        }
+        $userName = $this->get(['user_name'=>$userName]);
+        if($userName){
+            throw new UserInfoException([
+                "errMsg"=>"用户名已注册",
+                "respCode"=>"40003"
+            ]);
+        }
+        $Code = Cache::get($phone);
+        if($Code!==$verCode){
+            throw new VerfCodeException([
+                "errMsg"=>"验证码不正确",
+                "respCode"=>"50004"
             ]);
         }
     }
@@ -51,5 +82,7 @@ class UserInfo extends Model
         ];
         return $data;
     }
-
+    public function add($data){
+        return $this->save($data);
+    }
 }
