@@ -18,5 +18,6 @@ class UserInfoValidate extends BaseValidate{
         'login'=>['phone','password','msgId'],
         'getVerfCode'=>['phone','msgId'],
         'register'=>['phone','userName','openId','password','verfCode','msgId'],
+        'forgetPwd'=>['phone','password','verfCode','msgId'],
     ];
 }

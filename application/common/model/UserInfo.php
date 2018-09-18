@@ -22,7 +22,7 @@ class UserInfo extends Model
     protected $createTime = 'register_date';
     protected $updateTime = 'login_date';
     // 检查登录用户是否合法
-    public  function  checkUser($phone, $password)
+    public function checkUser($phone, $password)
     {
         $userInfo=$this->get(['phone'=>$phone]);
         if(!$userInfo){
@@ -61,6 +61,29 @@ class UserInfo extends Model
                 "respCode"=>"50004"
             ]);
         }
+    }
+    // 检查忘记密码用户是否未注册，验证码是否错误
+    public function checkUserMessage($phone,$verCode){
+        $result = $this->get(['phone'=>$phone]);
+        if(empty($result)){
+            throw new UserInfoException([
+                "errMsg"=>"号码未注册",
+                "respCode"=>"40003"
+            ]);
+        }
+        $Code = Cache::get($phone);
+        if($Code!==$verCode){
+            throw new VerfCodeException([
+                "errMsg"=>"验证码不正确",
+                "respCode"=>"50004"
+            ]);
+        }
+    }
+    // 更新对应用户的密码
+    public function updatePassword($phone,$password){
+        $result = $this->where('phone',$phone)
+            ->update(['password'=>$password]);
+        return $result;
     }
     // 生成登录成功后的返回信息
     public function createLoginInfo($phone){
