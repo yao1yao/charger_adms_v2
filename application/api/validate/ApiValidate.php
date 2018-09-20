@@ -2,7 +2,7 @@
 
 namespace app\api\validate;
 
-class UserInfoValidate extends BaseValidate{
+class ApiValidate extends BaseValidate{
     protected $rule = [
         ['openId','require|isNotEmpty'],
         ['rechargeMoney','require|isNotEmpty'],
@@ -12,6 +12,7 @@ class UserInfoValidate extends BaseValidate{
         ['msgId','require|isMsgId'],
         ['userName','require|isNotEmpty'],
         ['verfCode','require|isNotEmpty'],
+        ['chargerNumber','require']
     ];
     protected $scene=[
         'createOrder'=>['openId','rechargeMoney','userId','msgId'],
@@ -19,5 +20,6 @@ class UserInfoValidate extends BaseValidate{
         'getVerfCode'=>['phone','msgId'],
         'register'=>['phone','userName','openId','password','verfCode','msgId'],
         'forgetPwd'=>['phone','password','verfCode','msgId'],
+        'updateChargerInfo'=>['chargerNumber','msgId']
     ];
 }

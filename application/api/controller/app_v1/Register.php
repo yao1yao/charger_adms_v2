@@ -16,7 +16,7 @@ class Register extends BaseController
 {
     public function command()
     {
-        $data = $this->UserInfoValidate->goCheck('register');
+        $data = $this->ApiValidate->goCheck('register');
         // 判断用户是否已注册，验证码是否正确
         $this->UserInfoModel->checkUserInfo($data['phone'],$data['userName'],$data['verfCode']);
         // 构造需要存入数据库的信息

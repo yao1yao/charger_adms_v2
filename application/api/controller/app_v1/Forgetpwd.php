@@ -13,7 +13,7 @@ use app\lib\exception\SqlException;
 class Forgetpwd extends BaseController
 {
     public function command(){
-        $data = $this->UserInfoValidate->goCheck('forgetPwd');
+        $data = $this->ApiValidate->goCheck('forgetPwd');
         $phone = $data['phone'];
         $verfCode = $data['verfCode'];
         // 检查用户是否未注册，验证码是否正确
