@@ -9,13 +9,13 @@
 namespace app\api\controller\app_v1;
 
 
-use app\api\validate\UserInfoValidate;
+use app\api\validate\ApiValidate;
 use think\Controller;
 
 class Login extends BaseController
 {
     public function command(){
-        $data = $this->UserInfoValidate->goCheck('login');
+        $data = $this->ApiValidate->goCheck('login');
         // 判断用户是否合法
         $this->UserInfoModel->checkUser($data['phone'],$data['password']);
         // 生成登录信息

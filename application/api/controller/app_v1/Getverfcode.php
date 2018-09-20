@@ -14,11 +14,11 @@ use app\api\service\VerfCode;
 use app\lib\exception\VerfCodeException;
 use think\Cache;
 
-class GetVerfCode extends BaseController
+class Getverfcode extends BaseController
 {
     public function command()
     {
-        $data = $this->UserInfoValidate->goCheck('getVerfCode');
+        $data = $this->ApiValidate->goCheck('getVerfCode');
         if(Cache::get($data['phone'])){
             throw new VerfCodeException([
                 'respCode'=>50002,

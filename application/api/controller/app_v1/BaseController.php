@@ -9,19 +9,23 @@
 namespace app\api\controller\app_v1;
 
 
-use app\api\validate\UserInfoValidate;
+use app\api\validate\ApiValidate;
 use think\Controller;
 
 class BaseController extends Controller
 {
     public $UserRechargeRecordModel;
     public $UserInfoModel;
-    public $UserInfoValidate;
+    public $DeviceInfoModel;
+    public $ChargerInfoModel;
+    public $ApiValidate;
 
     public function _initialize()
     {
         $this->UserInfoModel=model('UserInfo');
         $this->UserRechargeRecordModel=model('UserRechargeRecord');
-        $this->UserInfoValidate = new UserInfoValidate();
+        $this->DeviceInfoModel=model('DeviceInfo');
+        $this->ChargerInfoModel=model('ChargerInfo');
+        $this->ApiValidate = new ApiValidate();
     }
 }
