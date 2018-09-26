@@ -8,6 +8,10 @@ define('RECHARGE_RECORD',2);
 define('GET',0);
 define('POST',1);
 
+// 充电类型
+define('CHARGING_TYPE_MONEY',0);
+define('CHARGING_TYPE_TIME',1);
+
 //返回前端数据格式
 function respSuccess($data=[]){
     return json(array_merge($data,[
@@ -23,4 +27,8 @@ function chargerBack($respCode,$data=[]){
     ]);
 }
 
+//构造唯一订单
+function generateOrderNumber($type){
+    return date("mdHis") . sprintf("%04d", mt_rand(0, 9999)) . sprintf("%02d", $type);
+}
 

@@ -10,6 +10,7 @@ namespace app\common\model;
 
 
 use app\lib\exception\ChargerException;
+use app\lib\exception\ChargerInfoException;
 use app\lib\exception\NotFoundException;
 use think\Model;
 
@@ -20,29 +21,53 @@ class ChargerInfo extends Model
     protected $updateTime = false;
 
     public function deviceInfo(){
-        return $this->belongsTo('DeviceInfo','device_id')->field('device_power');
+        return $this->belongsTo('DeviceInfo','device_id','id')->field('device_power');
     }
     public function ChargerBill(){
         return $this->hasOne('ChargerBillModel','id','cost_id')->field('energy_rate,service_rate,min_pay');
     }
-    public function getChargerInfo($deviceId){
+
+    /**
+     * 获取当前设备的功率，电费，服务费
+     * @param $chargerNumber
+     * @return array
+     * @throws ChargerException
+     * @throws NotFoundException
+     * @throws \Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getChargerInfo($chargerNumber){
         $data=[
             'status'=>1,
-            'device_number'=>intval($deviceId),
+            'charger_number'=>intval($chargerNumber),
         ];
-        $Chargerinfo = $this->where($data)->find();
-        if(!$Chargerinfo){
+        $chargerInfo = $this->where($data)->find();
+        if(!$chargerInfo){
             throw new NotFoundException([
                 'errMsg'=>'设备不存在'
             ]);
         }
-        // 获取设备当前状态
-        $this->checkChargerIsFree($Chargerinfo['device_id']);
-        $res = $this->with('deviceInfo')->find($Chargerinfo['device_id']);
-        return $res;
+        // 检查设备当前是否可用
+        $this->checkChargerIsFree($chargerInfo['device_id']);
+        $chargerDeviceInfo = self::get(['device_id'=>$chargerInfo['device_id']]);
+        $chargerBillModelInfo = self::get(['cost_id'=>$chargerInfo['cost_id']]);
+        $data=[
+            "devicePower"=>$chargerDeviceInfo->deviceinfo->device_power,
+            "energyRate"=>$chargerBillModelInfo->chargerbill->energy_rate,
+            "serviceRate"=>$chargerBillModelInfo->chargerbill->service_rate
+        ];
         // 关联获取数据
-        return $Chargerinfo;
+        return $data;
     }
+
+    /**
+     * 判断当前设备是否可用
+     * @param $deviceId
+     * @throws ChargerException
+     * @throws \Exception
+     */
     public function checkChargerIsFree($deviceId){
         $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['getChargerStatus'];
         $data = [
@@ -84,6 +109,77 @@ class ChargerInfo extends Model
                     'errMsg' => '电表异常'
                 ]);
                 break;
+        }
+    }
+
+
+    /**
+     * 转化为需要花费的金额,并判断设备是否可用
+     * 1.设备是否可用
+     *
+     * @param $chargerNumber
+     * @throws ChargerException
+     * @throws NotFoundException
+     * @throws \Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function estimateMoney($chargerNumber,$type,$value){
+        $currentMoney = 0;
+        $result=$this->getChargerInfo($chargerNumber);
+        switch($type)
+        {
+            case CHARGING_TYPE_MONEY:
+                $currentMoney = $value;
+                break;
+            case CHARGING_TYPE_TIME:
+                $currentMoney = ($result['energyRate']+$result['serviceRate'])*$result['devicePower']*$value/60;
+        }
+        return $currentMoney;
+    }
+    public function startCharging($userId,$chargerNumber,$type,$value){
+        // 转化为设备Id
+        $data=[
+            'status'=>1,
+            'charger_number'=>intval($chargerNumber),
+        ];
+        $chargerInfo = $this->where($data)->find();
+        // 将用户输入转化为充电信息
+        $chargingInfo = $this->convertType($chargerNumber,$type,$value);
+        // 构造发送到连接层接口的所需字段
+        $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['setChargerStart'];
+        $data = [
+            'deviceId' => intval($chargerInfo['device_id']),
+            'msgId' => config('DevServer.msgId'),
+            'userId'=>intval($userId),
+            'type'=>intval($type),
+            'time'=>intval($chargingInfo['time']),
+            'energy'=>intval($chargingInfo['energy'])
+        ];
+        $result = sendCommand($url, POST, $data);
+        if($result['data']['respCode']!==100){
+            throw new ChargerInfoException([
+                'respCode'=>60002,
+                'errMsg'=> '设备开启失败'
+            ]);
+        }
+        return $data;
+    }
+    public function convertType($chargerNumber,$type,$value){
+        $result=$this->getChargerInfo($chargerNumber);
+        switch($type){
+            case CHARGING_TYPE_MONEY:
+                return [
+                    'time'=>0,
+                    'energy'=>($value)/($result['energyRate']+$result['serviceRate']),
+                ];
+                break;
+            case CHARGING_TYPE_TIME:
+                return [
+                    'time'=>$value,
+                    'energy'=>0
+                ];
         }
     }
 }

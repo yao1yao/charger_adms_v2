@@ -15,6 +15,6 @@ class Updatechargerinfo extends BaseController
         $data = $this->ApiValidate->goCheck('updateChargerInfo');
         // 检查设备是否已注册
         $result = $this->ChargerInfoModel->getChargerInfo($data['chargerNumber']);
-        return json($result);
+        return chargerBack(100,$result);
     }
 }
