@@ -15,7 +15,7 @@ return [
     // 服务器地址
     'hostname'        => '119.23.18.135',
     // 数据库名
-    'database'        => 'charger',
+    'database'        => 'charger_v2',
     // 用户名
     'username'        => 'mysql-admin',
     // 密码

@@ -12,7 +12,10 @@ class ApiValidate extends BaseValidate{
         ['msgId','require|isMsgId'],
         ['userName','require|isNotEmpty'],
         ['verfCode','require|isNotEmpty'],
-        ['chargerNumber','require']
+        ['chargerNumber','require'],
+        ['type','require'],
+        ['value','require'],
+        ['payType','require'],
     ];
     protected $scene=[
         'createOrder'=>['openId','rechargeMoney','userId','msgId'],
@@ -20,6 +23,7 @@ class ApiValidate extends BaseValidate{
         'getVerfCode'=>['phone','msgId'],
         'register'=>['phone','userName','openId','password','verfCode','msgId'],
         'forgetPwd'=>['phone','password','verfCode','msgId'],
-        'updateChargerInfo'=>['chargerNumber','msgId']
+        'updateChargerInfo'=>['chargerNumber','msgId'],
+        'startCharging'=>['msgId','openId','type','userId','chargerNumber','value','payType'],
     ];
 }
