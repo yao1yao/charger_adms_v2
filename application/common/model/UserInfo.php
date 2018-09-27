@@ -15,7 +15,7 @@ class UserInfo extends Model
 {
     protected $createTime = 'register_date';
     protected $updateTime = 'login_date';
-
+    protected $autoWriteTimestamp="datetime";
     /**
      * 登录检查用户信息是否合法
      * @param $phone

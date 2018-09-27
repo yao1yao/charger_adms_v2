@@ -37,7 +37,7 @@ class UserRechargeRecord extends Model
             // 保存预支付订单
             $this->preSaveRechargeOrder([
                 'user_id'=>$data['userId'],
-                'recharge_money'=>$data['rechargeMoney'],
+                'recharge_money'=>$data['rechargeMoney']/100,
                 'out_trade_no'=>$orderConfig['out_trade_no']
             ]);
                 return $config;
