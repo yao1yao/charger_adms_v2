@@ -22,14 +22,28 @@ class Wechat extends Controller
     /**
      * 用户点击自定义菜单入口
      */
-    public function command(){
+    public function command($chargerNumber=0){
         $oauth =  $this->app ->oauth;
         if(empty(Session::get('wechat_user'))){
             Session::set('target_url',config('Host.domain').'app-entrance');
             $this->redirect($oauth->redirect()->getTargetUrl());
         }else{
             $user = Session::get('wechat_user');
-            $this->redirect(config('Host.domain').'static/app_v1/index.html#?openId=' . $user['original']['openid']);
+            $userInfo = $this->app->user->get($user['original']['openid']);
+            // 获取用户信息错误
+            if(!empty($userInfo['errcode'])){
+                $this->redirect(config('Host.domain').'static/app_v1/index.html#/error');
+            }
+            // 用户未订阅，重定向到关注公众号界面
+            if($userInfo['subscribe']===0){
+                $this->redirect(config('Host.domain').'static/app_v1/index.html#/focus');
+            }
+            // 如果不是扫描了电桩编号进入的
+            if($chargerNumber===0){
+                $this->redirect(config('Host.domain').'static/app_v1/index.html#/login?openId='.$user['original']['openid']);
+            }else{
+                $this->redirect(config('Host.domain').'static/app_v1/index.html#/charger-start?openId='.$user['original']['openid'].'&chargerNumber='.$chargerNumber);
+            }
         }
     }
     public function oauthCallback(){
@@ -85,7 +99,7 @@ class Wechat extends Controller
                 'addCard',
                 'chooseCard',
                 'openCard'
-            ], $debug = true, $beta = false, $json = true);
+            ], $debug = false, $beta = false, $json = true);
     }
 
     /**
