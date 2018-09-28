@@ -17,6 +17,7 @@ Route::post('v1/forgetpwd','api/app_v1.forgetpwd/command');
 Route::get('v1/verfcode','api/app_v1.getverfcode/command');
 Route::get('v1/charger-info','api/app_v1.updatechargerinfo/command');
 Route::post('v1/charger-start','api/app_v1.startcharging/command');
+Route::post('v1/charging-info','api/app_v1.getcharginginfo/command');
 
 // 微信路由
 Route::any('wechat/pay-push','api/app_v1.wechat/paypush');

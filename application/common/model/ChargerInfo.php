@@ -182,4 +182,45 @@ class ChargerInfo extends Model
                 ];
         }
     }
+
+    /**
+     * 根据设备编号获取设备id
+     * @param $chargerNumber
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDeviceId($chargerNumber){
+        $data=[
+            'status'=>1,
+            'charger_number'=>intval($chargerNumber),
+        ];
+        $chargerInfo = $this->where($data)->find();
+        return $chargerInfo['device_id'];
+    }
+
+
+    public function getChargingInfo($deviceId){
+
+        $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['getChargingInfo'];
+        $data = [
+            'deviceId' => intval($deviceId),
+            'msgId' => config('DevServer.msgId')
+        ];
+        $result = sendCommand($url, POST, $data);
+        if($result['data']['respCode']!==100){
+            throw new ChargerInfoException([
+                'errMsg'=>'设备未在充电中'
+            ]);
+        }
+        return [
+            'isCharging' => $result['data']['status']===2? true:false,
+            'energy' => $result['data']['energy'],
+            'voltage' => $result['data']['voltage'],
+            'current' => $result['data']['current'],
+            'power' => $result['data']['power'],
+            'duration'=>$result['data']['duration']
+        ];
+    }
 }
