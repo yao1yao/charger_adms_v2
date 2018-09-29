@@ -37,7 +37,7 @@ class Startcharging extends BaseController
             'consume_number'=>generateOrderNumber(CONSUME_RECORD),
         ];
         // 先保存消费订单
-        $result = $this->UserChargingRecord->saveChargingRecord($data['userId'],$chargingBill);
+        $result = $this->UserChargingRecordModel->saveChargingRecord($data['userId'],$chargingBill);
         // 更新用户充电状态
         $this->UserInfoModel->isUpdate(true)->save(['is_charging'=>1], ['id' => $data['userId']]);
         if($result){

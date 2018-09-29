@@ -2,12 +2,10 @@
 namespace app\api\controller\app_v1;
 
 
-use app\common\model\UserChargingRecord;
 use app\common\model\UserInfo;
 use app\common\model\UserRechargeRecord;
 use EasyWeChat\Factory;
 use think\Controller;
-use think\Log;
 use think\Session;
 
 class Wechat extends Controller
