@@ -8,6 +8,12 @@ use app\lib\exception\WechatException;
 
 class UserRechargeRecord extends Model
 {
+    // 与用户模型的关联
+
+    public function userInfo(){
+        return $this->belongsTo('UserInfo','user_id');
+    }
+
     public function createOrder($data)
     {
         $app = Factory::payment(config('Wechat.config'));
@@ -64,5 +70,24 @@ class UserRechargeRecord extends Model
                 'respCode'=>30001
             ]);
         }
+    }
+    /**
+     * 获取充值记录
+     */
+    public function getReChargerRecord($userId){
+        $reChargerRecord = $this->where(['user_id'=>$userId])
+            ->whereTime('recharge_time','month')
+            ->field('id,user_id,recharge_invoice,recharge_remark,transaction_id,out_trade_no',true)
+            ->order('recharge_time','desc')
+            ->select();
+        // 总共充值的钱
+        $sumRechargeMoney = $this->where(['user_id'=>$userId])->sum('recharge_money');
+        // 用户所剩余额, 暂时不返回，在登录时已经返回过余额
+//      $payMoney = self::get(['user_id'=>$userId])->userInfo->pay;
+        return [
+            'reChargerRecord'=>$reChargerRecord,
+            'sumRechargeMoney'=>$sumRechargeMoney,
+        ];
+
     }
 }

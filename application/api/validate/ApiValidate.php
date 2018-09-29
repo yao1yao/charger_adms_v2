@@ -27,6 +27,8 @@ class ApiValidate extends BaseValidate{
         'startCharging'=>['msgId','openId','type','userId','chargerNumber','value','payType'],
         'getChargingInfo'=>['msgId','chargerNumber','userId'],
         'endCharging'=>['msgId','chargerNumber','userId'],
-        'getChargerRecord'=>['msgId','userId']
+        'getChargerRecord'=>['msgId','userId'],
+        'getReChargerRecord'=>['msgId','userId'],
+
     ];
 }
