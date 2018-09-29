@@ -16,6 +16,10 @@ use think\Model;
 
 class UserChargingRecord extends Model
 {
+    protected $createTime = 'start_time';
+    protected $updateTime = 'end_time';
+    protected $autoWriteTimestamp = "datetime";
+
     /**
      * 根据 userId 生成缓存
      * @param $userId   用户 ID
@@ -48,5 +52,37 @@ class UserChargingRecord extends Model
             'energy'=>$energy
         ]);
     }
+    public function getChargerRecord($userId){
+        $chargerRecord = $this->where(['user_id'=>$userId])
+            ->whereTime('start_time','month')
+            ->field('user_id,set_duration,set_energy,end_type,charging_type,consume_number',true)
+            ->order('id','desc')
+            ->select();
+        if(!$chargerRecord){
+            throw new SqlException([
+                'errMsg'=>'暂无充电记录',
+                'respCode'=>30002
+            ]);
+        }
+        // 改用户总共充电的时间
+        $sumDuration = $this->where(['user_id'=>$userId])->sum('duration');
+        // 用户总共充电的度数
+        $sumEnergy = $this->where(['user_id'=>$userId])->sum('energy');
+        // 生成带地址的充电记录
+        $record=[];
+        foreach ($chargerRecord as $key=>$value){
+            $address = model('ChargerInfo')->where('charger_number',intval($value['charger_number']))->column('address');
+            $arr = json_decode(json_encode($value),true);
+            $chargerAddress=[
+                "address"=>$address[0]
+            ];
+            $record[$key]= array_merge($arr,$chargerAddress);
 
+        }
+        return [
+            'allRecord'=>$record,
+            'sumDuration'=>$sumDuration,
+            'sumEnergy'=>$sumEnergy
+        ];
+    }
 }

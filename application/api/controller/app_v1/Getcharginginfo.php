@@ -20,7 +20,7 @@ class Getcharginginfo extends BaseController
 
         // 如果还在充电，更新当前设备的充电时间和耗电量
         if($chargingInfo['isCharging']){
-            $this->UserChargingRecord->updateChargingRecord($data['userId'],$chargingInfo['energy'],$chargingInfo['duration']);
+            $this->UserChargingRecordModel->updateChargingRecord($data['userId'],$chargingInfo['energy'],$chargingInfo['duration']);
         }
         return chargerBack(100,$chargingInfo);
 

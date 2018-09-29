@@ -19,6 +19,7 @@ Route::get('v1/charger-info','api/app_v1.updatechargerinfo/command');
 Route::post('v1/charger-start','api/app_v1.startcharging/command');
 Route::post('v1/charger-end','api/app_v1.endcharging/command');
 Route::post('v1/charging-info','api/app_v1.getcharginginfo/command');
+Route::get('v1/charger-record','api/app_v1.getchargerrecord/command');
 
 // 微信路由
 Route::any('wechat/pay-push','api/app_v1.wechat/paypush');
