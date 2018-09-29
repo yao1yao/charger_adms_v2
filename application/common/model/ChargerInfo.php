@@ -200,7 +200,12 @@ class ChargerInfo extends Model
         return $chargerInfo['device_id'];
     }
 
-
+    /**
+     * 获取正在充电的设备充电信息
+     * @param $deviceId
+     * @return array
+     * @throws ChargerInfoException
+     */
     public function getChargingInfo($deviceId){
 
         $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['getChargingInfo'];
@@ -223,4 +228,24 @@ class ChargerInfo extends Model
             'duration'=>$result['data']['duration']
         ];
     }
+    public function endCharging($deviceId){
+        $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['setChargerEnd'];
+        $data = [
+            'deviceId' => intval($deviceId),
+            'msgId' => config('DevServer.msgId')
+        ];
+        $result = sendCommand($url, POST, $data);
+        if($result['data']['respCode']!==100){
+            throw new ChargerInfoException([
+                'errMsg'=>'设备结束充电失败'
+            ]);
+        }
+        return [
+            'isCharging' => $result['data']['status']===2? true:false,
+            'energy' => $result['data']['energy'],
+            'duration'=>$result['data']['duration']
+        ];
+    }
 }
+
+

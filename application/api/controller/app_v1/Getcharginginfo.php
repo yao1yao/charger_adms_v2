@@ -13,7 +13,7 @@ class Getcharginginfo extends BaseController
 {
     public function command(){
         $data = $this->ApiValidate->goCheck('getChargingInfo');
-        // 获取设备充电信息
+        // 获取设备id
         $deviceId = $this->ChargerInfoModel->getDeviceId($data['chargerNumber']);
         // 获取开始充电信息
         $chargingInfo = $this->ChargerInfoModel->getChargingInfo($deviceId);

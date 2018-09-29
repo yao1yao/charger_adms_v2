@@ -25,6 +25,7 @@ class ApiValidate extends BaseValidate{
         'forgetPwd'=>['phone','password','verfCode','msgId'],
         'updateChargerInfo'=>['chargerNumber','msgId'],
         'startCharging'=>['msgId','openId','type','userId','chargerNumber','value','payType'],
-        'getChargingInfo'=>['msgId','chargerNumber','userId']
+        'getChargingInfo'=>['msgId','chargerNumber','userId'],
+        'endCharging'=>['msgId','chargerNumber','userId'],
     ];
 }
