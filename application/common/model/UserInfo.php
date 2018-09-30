@@ -8,6 +8,7 @@ use app\lib\exception\NotFoundException;
 use app\lib\exception\UserInfoException;
 use app\lib\exception\VerfCodeException;
 use think\Cache;
+use think\Exception;
 use think\exception\ValidateException;
 use think\Model;
 
@@ -43,6 +44,22 @@ class UserInfo extends Model
     }
 
     /**
+     *
+     * 检查验证码是否正确
+     * @param $phone
+     * @param $verfCode
+     * @throws VerfCodeException
+     */
+    public function checkVerfCode($phone,$verfCode){
+        $Code = Cache::get($phone);
+        if($Code!==$verfCode){
+            throw new VerfCodeException([
+                "errMsg"=>"验证码不正确",
+                "respCode"=>"50004"
+            ]);
+        }
+    }
+    /**
      * 注册时，检查用户信息是否已注册, 验证码是否正确
      * @param $phone
      * @param $userName
@@ -66,13 +83,7 @@ class UserInfo extends Model
                 "respCode"=>"40003"
             ]);
         }
-        $Code = Cache::get($phone);
-        if($Code!==$verCode){
-            throw new VerfCodeException([
-                "errMsg"=>"验证码不正确",
-                "respCode"=>"50004"
-            ]);
-        }
+        $this->checkVerfCode($phone,$verCode);
     }
 
     /**
@@ -91,13 +102,8 @@ class UserInfo extends Model
                 "respCode"=>"40003"
             ]);
         }
-        $Code = Cache::get($phone);
-        if($Code!==$verCode){
-            throw new VerfCodeException([
-                "errMsg"=>"验证码不正确",
-                "respCode"=>"50004"
-            ]);
-        }
+        $this->checkVerfCode($phone,$verCode);
+
     }
     // 更新对应用户的密码
     public function updatePassword($phone,$password){
@@ -152,5 +158,22 @@ class UserInfo extends Model
            ]);
        }
     }
-
+    public function modifyDatum($userId,$phone,$userName){
+            $oldPhone = self::where('id',$userId)->value('phone');
+            $oldUserName = self::where('id',$userId)->value('user_name');
+            if($oldPhone===$phone&&$oldUserName===$userName){
+                throw new UserInfoException([
+                    'errMsg'=>'当前信息并未变更'
+                ]);
+            }
+            $res = $this->where('id',$userId)
+                ->update(['phone'=>$phone,'user_name'=>$userName]);
+            if(!$res){
+                throw new Exception('内部错误');
+            }
+            return [
+                'userName'=>$userName,
+                'phone'=>$phone
+            ];
+    }
 }

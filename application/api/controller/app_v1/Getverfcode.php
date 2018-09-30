@@ -31,7 +31,7 @@ class Getverfcode extends BaseController
         // 发送验证码
         $response = Sms::sendSms($code,$phone);
         if($response->Code === "OK"){
-            $res = Cache::set($phone,$code,60);
+            $res = Cache::set($phone,$code,80);
             if($res){
                 return chargerBack(100,["message"=>"发送成功，一分钟有效"]);
             }

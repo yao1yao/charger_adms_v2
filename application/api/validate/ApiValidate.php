@@ -33,5 +33,6 @@ class ApiValidate extends BaseValidate{
         'getReChargerRecord'=>['msgId','userId'],
         'feedback'=>['userId','tag','content','msgId'],
         'getNewestBalance'=>['userId','msgId'],
+        'modifydatum'=>['phone','msgId','userName','userId','verfCode'],
     ];
 }
