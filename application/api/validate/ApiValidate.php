@@ -16,6 +16,8 @@ class ApiValidate extends BaseValidate{
         ['type','require'],
         ['value','require'],
         ['payType','require'],
+        ['content','require'],
+        ['tag','require'],
     ];
     protected $scene=[
         'createOrder'=>['openId','rechargeMoney','userId','msgId'],
@@ -29,6 +31,6 @@ class ApiValidate extends BaseValidate{
         'endCharging'=>['msgId','chargerNumber','userId'],
         'getChargerRecord'=>['msgId','userId'],
         'getReChargerRecord'=>['msgId','userId'],
-
+        'feedback'=>['userId','tag','content','msgId'],
     ];
 }
