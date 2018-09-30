@@ -21,6 +21,7 @@ class Login extends BaseController
         // 生成登录信息
         $data = $this->UserInfoModel->createLoginInfo($data['phone']);
         // 返回给前端
+
         return chargerBack(100,$data);
     }
 }

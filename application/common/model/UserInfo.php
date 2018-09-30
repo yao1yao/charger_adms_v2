@@ -16,6 +16,8 @@ class UserInfo extends Model
     protected $createTime = 'register_date';
     protected $updateTime = 'login_date';
     protected $autoWriteTimestamp="datetime";
+
+
     /**
      * 登录检查用户信息是否合法
      * @param $phone
@@ -126,6 +128,7 @@ class UserInfo extends Model
             'userId'=>$userInfo['id'],
             'userName'=>$userInfo['user_name'],
             'balance'=>$userInfo['pay'],
+            'phone'=>$userInfo['phone'],
             'openId'=>$userInfo['open_id']
         ];
         return $data;
@@ -149,4 +152,5 @@ class UserInfo extends Model
            ]);
        }
     }
+
 }
