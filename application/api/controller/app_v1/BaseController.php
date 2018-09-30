@@ -19,7 +19,9 @@ class BaseController extends Controller
     public $DeviceInfoModel;
     public $ChargerInfoModel;
     public $UserChargingRecordModel;
+    public $UserFeedbackModel;
     public $ApiValidate;
+
 
     public function _initialize()
     {
@@ -28,6 +30,7 @@ class BaseController extends Controller
         $this->DeviceInfoModel=model('DeviceInfo');
         $this->ChargerInfoModel=model('ChargerInfo');
         $this->UserChargingRecordModel=model('UserChargingRecord');
+        $this->UserFeedbackModel=model('UserFeedback');
         $this->ApiValidate = new ApiValidate();
     }
 }
