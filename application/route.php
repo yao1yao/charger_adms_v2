@@ -22,6 +22,7 @@ Route::post('v1/charging-info','api/app_v1.getcharginginfo/command');
 Route::get('v1/charger-record','api/app_v1.getchargerrecord/command');
 Route::get('v1/recharger-record','api/app_v1.getrechargerrecord/command');
 Route::post('v1/feedback','api/app_v1.feedback/command');
+Route::get('v1/newest-balance','api/app_v1.getnewestbalance/command');
 
 // 微信路由
 Route::any('wechat/pay-push','api/app_v1.wechat/paypush');
