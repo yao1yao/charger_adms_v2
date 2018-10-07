@@ -145,6 +145,9 @@ class ChargerInfo extends Model
             'charger_number'=>intval($chargerNumber),
         ];
         $chargerInfo = $this->where($data)->find();
+        if(!$chargerInfo){
+            throw new NotFoundException(['errMsg'=> '当前设备不存在']);
+        }
         // 将用户输入转化为充电信息
         $chargingInfo = $this->convertType($chargerNumber,$type,$value);
         // 构造发送到连接层接口的所需字段
@@ -246,6 +249,31 @@ class ChargerInfo extends Model
             'duration'=>$result['data']['duration']
         ];
     }
+
+    /**
+     * 计算充电的实际消费金额
+     * 设备推送上来的是设备ID 不是chargerNumber
+     * @return array [电费,服务费]
+     */
+    public function calculateConsume($deviceId,$energy)
+    {
+        // 获取当前充电桩信息
+        $data=[
+            'status'=>1,
+            'device_id'=>intval($deviceId),
+        ];
+        $chargerInfo = $this->where($data)->find();
+        // 与 chargerBillModel 进行关联查询数据
+        $chargerBillModelInfo = self::get(['cost_id'=>$chargerInfo['cost_id']]);
+        // 计算消费金额
+        // 电费 =   电费(分/度) *消耗电量(度); 返回单位为分
+        // 服务费 = 服务费(分/度)*消耗电量(度); 返回单位为分
+        return [
+            'energyMoney'=>$chargerBillModelInfo->chargerbill->energy_rate*$energy,
+            'serviceMoney'=>$chargerBillModelInfo->chargerbill->service_rate*$energy
+        ];
+    }
+
 }
 
 

@@ -88,8 +88,3 @@ function doCurl($url, $type = 0, $data)
     return $output;
 }
 
-/**
- * @param $url
- * @param int $type 0 get 1 post
- * @param array $data
- */

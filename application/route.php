@@ -25,6 +25,8 @@ Route::post('v1/feedback','api/app_v1.feedback/command');
 Route::get('v1/newest-balance','api/app_v1.getnewestbalance/command');
 Route::post('v1/user-datum','api/app_v1.modifydatum/command');
 Route::post('v1/logout','api/app_v1.logout/command');
+Route::post('v1/notify','api/app_v1.devicenotify/command');
+
 // 微信路由
 Route::any('wechat/pay-push','api/app_v1.wechat/paypush');
 Route::any('wechat/oauth-callback','api/app_v1.wechat/oauthcallback');
@@ -33,3 +35,4 @@ Route::any('menus','api/app_v1.wechat/createmenu');
 Route::get('wechat/jssdk','api/app_v1.wechat/getjssdk');
 
 // adms 接口路由
+Route::post('adv1/notify','api/adms_v1.devicenotify/command');

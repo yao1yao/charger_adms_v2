@@ -10,6 +10,7 @@ use think\Session;
 
 class Wechat extends Controller
 {
+
     private $app;
     public function _initialize()
     {
@@ -150,4 +151,5 @@ class Wechat extends Controller
         });
         $response->send();
     }
+
 }
