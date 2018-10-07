@@ -34,5 +34,6 @@ class ApiValidate extends BaseValidate{
         'feedback'=>['userId','tag','content','msgId'],
         'getNewestBalance'=>['userId','msgId'],
         'modifydatum'=>['phone','msgId','userName','userId','verfCode'],
+        'logout'=>['msgId','userId'],
     ];
 }
