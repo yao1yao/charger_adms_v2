@@ -26,6 +26,7 @@ Route::get('v1/newest-balance','api/app_v1.getnewestbalance/command');
 Route::post('v1/user-datum','api/app_v1.modifydatum/command');
 Route::post('v1/logout','api/app_v1.logout/command');
 Route::post('v1/notify','api/app_v1.devicenotify/command');
+Route::get('v1/allchargerinfo','api/app_v1.getallchargerinfo/command');
 
 // 微信路由
 Route::any('wechat/pay-push','api/app_v1.wechat/paypush');

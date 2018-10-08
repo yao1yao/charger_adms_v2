@@ -39,7 +39,7 @@ class Wechat extends Controller
             }
             // 如果不是扫描了电桩编号进入的
             if($chargerNumber===0){
-                $this->redirect(config('Host.domain').'static/app_v1/index.html#/login?openId='.$user['original']['openid']);
+                $this->redirect(config('Host.domain').'static/app_v1/index.html#/home?openId='.$user['original']['openid']);
             }else{
                 $this->redirect(config('Host.domain').'static/app_v1/index.html#/charger-start?openId='.$user['original']['openid'].'&chargerNumber='.$chargerNumber);
             }

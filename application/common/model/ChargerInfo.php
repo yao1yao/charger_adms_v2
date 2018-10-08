@@ -274,6 +274,48 @@ class ChargerInfo extends Model
         ];
     }
 
+    /**
+     * 获取所有设备信息，作为地图展示数据
+     */
+    public function getAllChargerInfo(){
+        $url = config('DevServer.ServerUrl').config('DevServer.ServerApiName')['getAllInfo'];
+        $data = [
+            'msgId' => config('DevServer.msgId')
+        ];
+        $result = sendCommand($url, 1, $data);
+        if ($result['data']['respCode'] !== 100) {
+            throw new \Exception('内部错误');
+        }
+        $chargingInfo = [];
+        //根据获得的设备Id 查询出 设备地址和经纬度，进行封装成对应的返回数组
+        foreach ($result['data']['client'] as $key => $value) {
+            //设备非法
+            if ($value['illegal']) {
+                continue;
+            }
+            $locationInfo=$this->where('device_id',$value['id'])->field('address,map_position,cost_id')->select()[0];
+            if(empty($locationInfo)){
+                throw new NotFoundException([
+                    'errMsg'=>'请在充电桩信息中添加第'.$value['id'].'号设备的地理位置'
+                ]);
+            }
+            $chargerBillModelInfo = self::get(['cost_id'=>$locationInfo['cost_id']]);
+            if(empty($locationInfo)){
+                throw new NotFoundException([
+                    'errMsg'=>'改消费方式还未注册'
+                ]);
+            }
+            $chargingInfo[$key] = [
+                "address" => $locationInfo['address'],
+                "deviceId" => $value['id'],
+                "status" => $value['runStatus'],
+                "mapPosition" => [explode(',', $locationInfo['map_position'])[0], explode(',', $locationInfo['map_position'])[1]],
+                "energyMoney"=>$chargerBillModelInfo->chargerbill->energy_rate,
+                "serviceMoney"=>$chargerBillModelInfo->chargerbill->service_rate,
+            ];
+        }
+        return $chargingInfo;
+    }
 }
 
 
