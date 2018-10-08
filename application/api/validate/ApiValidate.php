@@ -37,5 +37,6 @@ class ApiValidate extends BaseValidate{
         'notify'=>['deviceId','msgId'],
         'modifydatum'=>['phone','msgId','userName','userId','verfCode'],
         'logout'=>['msgId','userId'],
+        'allChargerInfo'=>['msgId','userId'],
     ];
 }
