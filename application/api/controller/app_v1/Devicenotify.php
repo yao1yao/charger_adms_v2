@@ -22,8 +22,7 @@ class Devicenotify extends BaseController
         $energy = $info['energy'];
         $endType = $info['endType'];
         // 结束充电后，计算所需花费，更新充电记录与账户余额, 推送信息给用户
-        $result = $this->UserChargingRecordModel->settleCharging($deviceId,$userId,$energy,$endType);
-        return json($result);
+        $this->UserChargingRecordModel->settleCharging($deviceId,$userId,$energy,$endType);
         return json(['repsCode'=>100]);
     }
 }

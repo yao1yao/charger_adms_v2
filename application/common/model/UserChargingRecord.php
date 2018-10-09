@@ -97,7 +97,7 @@ class UserChargingRecord extends Model
         $chargingRecord = $this->where(['consume_number'=>$consumeInfo['consume_number']])->find();
         if(!$chargingRecord){
             throw new NotFoundException([
-                'errMsg'=>'订单已结算'
+                'errMsg'=>'订单不存在'
             ]);
         }
         // 调用充电信息模型计算所需花费
@@ -128,9 +128,9 @@ class UserChargingRecord extends Model
             'fee'=>$consumeMoney['energyMoney']+$consumeMoney['serviceMoney']
         ],$openId);
         // 推送成功删除缓存
-        if($result['errcode']===0){
-            Cache::rm($userId);
-        }
+//        if($result['errcode']===0){
+//            Cache::rm($userId);
+//        }
     }
     /**
      * 获取订单号
