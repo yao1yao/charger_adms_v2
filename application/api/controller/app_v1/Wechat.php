@@ -5,6 +5,7 @@ namespace app\api\controller\app_v1;
 use app\common\model\UserInfo;
 use app\common\model\UserRechargeRecord;
 use EasyWeChat\Factory;
+use think\Cache;
 use think\Controller;
 use think\Session;
 
@@ -15,7 +16,6 @@ class Wechat extends Controller
     public function _initialize()
     {
         $this->app = Factory::officialAccount(config('Wechat.config'));
-
     }
 
     /**
@@ -28,7 +28,8 @@ class Wechat extends Controller
             $this->redirect($oauth->redirect()->getTargetUrl());
         }else{
             $user = Session::get('wechat_user');
-            $userInfo = $this->app->user->get($user['original']['openid']);
+            $openId = $user['original']['openid'];
+            $userInfo = $this->app->user->get($openId);
             // 获取用户信息错误
             if(!empty($userInfo['errcode'])){
                 $this->redirect(config('Host.domain').'static/app_v1/index.html#/error');
@@ -38,10 +39,47 @@ class Wechat extends Controller
                 $this->redirect(config('Host.domain').'static/app_v1/index.html#/focus');
             }
             // 如果不是扫描了电桩编号进入的
-            if($chargerNumber===0){
-                $this->redirect(config('Host.domain').'static/app_v1/index.html#/home?openId='.$user['original']['openid']);
+            // 获取用户注册过的信息
+            $result = UserInfo::where(['open_id'=>$openId])->find();
+            // 如果用户已注册
+            if($result){
+                // 如果用户通过公众号自定义菜单方式进入
+                if($chargerNumber===0){
+                    // 如果用户已注册过，但是当前状态为未登录
+                    if($result['is_login']===0) {
+                        $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/login');
+                    // 如果用户已注册过，但是当前状态为登录
+                    }else{
+                        // 如果用户未在充电中
+                        if($result['is_charging']===0){
+                            $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/home');
+                        // 如果用户在充电中
+                        }else{
+                            // 获取缓存的信息
+                            $cacheInfo = Cache::get($result['id']);
+                            $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/charger?'
+                                .'chargerNumber='.$cacheInfo['charger_number']
+                                .'&chargingType='.$cacheInfo['charging_type']
+                                .'&setDuration='.$cacheInfo['set_duration']
+                                .'&setEnergy='.$cacheInfo['set_energy']
+                            );
+                        }
+                    }
+                 // 如果用户是通过扫码进入的
+                }else{
+                    // 如果用户未登录
+                    if($result['is_login']===0){
+                        $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/home');
+                        // 如果用户在充电中
+                    }else{
+                        if($result['is_charging']===0){
+                            $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/charger-start?chargerNumber='.$chargerNumber);
+                        }
+                    }
+                }
             }else{
-                $this->redirect(config('Host.domain').'static/app_v1/index.html#/charger-start?openId='.$user['original']['openid'].'&chargerNumber='.$chargerNumber);
+              // 如果用户未注册
+              $this->redirect(config('Host.domain').'static/app_v1/index.html#/login?openId='.$openId);
             }
         }
     }

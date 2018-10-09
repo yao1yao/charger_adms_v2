@@ -64,7 +64,7 @@ class UserChargingRecord extends Model
             ->select();
         if(!$chargerRecord){
             throw new SqlException([
-                'errMsg'=>'暂无充电记录',
+                'errMsg'=>'本月暂无新的充电记录',
                 'respCode'=>30002
             ]);
         }
@@ -128,9 +128,9 @@ class UserChargingRecord extends Model
             'fee'=>$consumeMoney['energyMoney']+$consumeMoney['serviceMoney']
         ],$openId);
         // 推送成功删除缓存
-//        if($result['errcode']===0){
-//            Cache::rm($userId);
-//        }
+        if($result['errcode']===0){
+            Cache::rm($userId);
+        }
     }
     /**
      * 获取订单号

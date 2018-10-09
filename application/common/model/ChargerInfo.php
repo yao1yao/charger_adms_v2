@@ -139,21 +139,13 @@ class ChargerInfo extends Model
         return $currentMoney;
     }
     public function startCharging($userId,$chargerNumber,$type,$value){
-        // 转化为设备Id
-        $data=[
-            'status'=>1,
-            'charger_number'=>intval($chargerNumber),
-        ];
-        $chargerInfo = $this->where($data)->find();
-        if(!$chargerInfo){
-            throw new NotFoundException(['errMsg'=> '当前设备不存在']);
-        }
+        $deviceId = $this->getDeviceId($chargerNumber);
         // 将用户输入转化为充电信息
         $chargingInfo = $this->convertType($chargerNumber,$type,$value);
         // 构造发送到连接层接口的所需字段
         $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['setChargerStart'];
         $data = [
-            'deviceId' => intval($chargerInfo['device_id']),
+            'deviceId' => intval($deviceId),
             'msgId' => config('DevServer.msgId'),
             'userId'=>intval($userId),
             'type'=>intval($type),
@@ -183,6 +175,7 @@ class ChargerInfo extends Model
                     'time'=>$value,
                     'energy'=>0
                 ];
+                break;
         }
     }
 
@@ -200,6 +193,9 @@ class ChargerInfo extends Model
             'charger_number'=>intval($chargerNumber),
         ];
         $chargerInfo = $this->where($data)->find();
+        if(!$chargerInfo){
+            throw new NotFoundException(['errMsg'=> '当前设备不存在']);
+        }
         return $chargerInfo['device_id'];
     }
 

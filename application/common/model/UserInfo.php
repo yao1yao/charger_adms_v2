@@ -8,6 +8,7 @@ use app\lib\exception\NotFoundException;
 use app\lib\exception\UserInfoException;
 use app\lib\exception\VerfCodeException;
 use think\Cache;
+use think\Db;
 use think\Exception;
 use think\exception\ValidateException;
 use think\Model;
@@ -128,16 +129,33 @@ class UserInfo extends Model
         Cache::set($key,$value,604800);
         // 更改用户为登录状态
         $this->isUpdate(true)->save(['is_login'=>1],['phone'=>$phone]);
-        $data = [
-            'token'=>$key,
-            'consume'=>$userInfo['consume'],
-            'userId'=>$userInfo['id'],
-            'userName'=>$userInfo['user_name'],
-            'balance'=>$userInfo['pay'],
-            'phone'=>$userInfo['phone'],
-            'openId'=>$userInfo['open_id']
-        ];
-        return $data;
+        // 如果用户正在充电状态中
+        if($userInfo['is_charging']){
+            $cacheInfo = Cache::get($userInfo['id']);
+            $data = [
+                'token'=>$key,
+                'userId'=>$userInfo['id'],
+                'userName'=>$userInfo['user_name'],
+                'balance'=>$userInfo['pay'],
+                'phone'=>$userInfo['phone'],
+                'openId'=>$userInfo['open_id'],
+                'isCharging'=>$userInfo['is_charging'],
+                'chargingInfo'=>$cacheInfo,
+            ];
+            return $data;
+            //否则
+        }else {
+            $data = [
+                'token' => $key,
+                'userId' => $userInfo['id'],
+                'userName' => $userInfo['user_name'],
+                'balance' => $userInfo['pay'],
+                'phone' => $userInfo['phone'],
+                'openId' => $userInfo['open_id'],
+                'isCharging' => $userInfo['is_charging'],
+            ];
+            return $data;
+        }
     }
     public function add($data){
         return $this->save($data);
