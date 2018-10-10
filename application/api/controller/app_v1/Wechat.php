@@ -69,11 +69,21 @@ class Wechat extends Controller
                 }else{
                     // 如果用户未登录
                     if($result['is_login']===0){
-                        $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/home');
-                        // 如果用户在充电中
+                        $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/login');
+                    // 如果用户已登录
                     }else{
+                        // 如果用户未在充电中
                         if($result['is_charging']===0){
                             $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/charger-start?chargerNumber='.$chargerNumber);
+                        // 如果用户正在充电中
+                        }else{
+                            $cacheInfo = Cache::get($result['id']);
+                            $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/charger?'
+                                .'chargerNumber='.$cacheInfo['charger_number']
+                                .'&chargingType='.$cacheInfo['charging_type']
+                                .'&setDuration='.$cacheInfo['set_duration']
+                                .'&setEnergy='.$cacheInfo['set_energy']
+                            );
                         }
                     }
                 }
