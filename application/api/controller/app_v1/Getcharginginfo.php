@@ -16,7 +16,7 @@ class Getcharginginfo extends BaseController
         // 获取设备id
         $deviceId = $this->ChargerInfoModel->getDeviceId($data['chargerNumber']);
         // 获取开始充电信息
-        $chargingInfo = $this->ChargerInfoModel->getChargingInfo($deviceId);
+        $chargingInfo = $this->ChargerInfoModel->getChargingInfo($data['userId'],$deviceId);
         // 如果还在充电，更新当前设备的充电时间和耗电量
         if($chargingInfo['isCharging']){
             $this->UserChargingRecordModel->updateChargingRecord($data['userId'],$chargingInfo['energy'],$chargingInfo['duration']);

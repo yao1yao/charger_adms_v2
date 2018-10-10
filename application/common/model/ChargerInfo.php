@@ -12,6 +12,7 @@ namespace app\common\model;
 use app\lib\exception\ChargerException;
 use app\lib\exception\ChargerInfoException;
 use app\lib\exception\NotFoundException;
+use think\Cache;
 use think\Model;
 
 class ChargerInfo extends Model
@@ -205,7 +206,7 @@ class ChargerInfo extends Model
      * @return array
      * @throws ChargerInfoException
      */
-    public function getChargingInfo($deviceId){
+    public function getChargingInfo($userId,$deviceId){
 
         $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['getChargingInfo'];
         $data = [
@@ -213,19 +214,35 @@ class ChargerInfo extends Model
             'msgId' => config('DevServer.msgId')
         ];
         $result = sendCommand($url, POST, $data);
+        // 当前充电信息异常,  可能导致无法推送
+        // 如果获取充电信息失败了,那么需要服务器进行结算
         if($result['data']['respCode']!==100){
+            // 进行结算
+            // 获取充电订单缓存信息
+            $cacheInfo = model('UserChargingRecord')->getChargingCacheInfo($userId);
+            // 获取订单存入数据库的最后一条记录
+            $chargingRecord = model('UserChargingRecord')->where(['consume_number'=>$cacheInfo['consume_number']])->find();
+            if(!$chargingRecord){
+                throw new NotFoundException([
+                            'errMsg'=>'数据库充电订单不存在'
+                ]);
+            }
+            // 进行结算
+            model('UserChargingRecord')->settleCharging($deviceId, $userId, $chargingRecord['energy'], $chargingRecord['charging_type']);
             throw new ChargerInfoException([
-                'errMsg'=>'设备未在充电中'
+                'errMsg' => '设备已离线'
             ]);
+        }else{
+            return [
+                'isCharging' => $result['data']['status']===2? true:false,
+                'energy' => $result['data']['energy'],
+                'voltage' => $result['data']['voltage'],
+                'current' => $result['data']['current'],
+                'power' => $result['data']['power'],
+                'duration'=>$result['data']['duration']
+            ];
         }
-        return [
-            'isCharging' => $result['data']['status']===2? true:false,
-            'energy' => $result['data']['energy'],
-            'voltage' => $result['data']['voltage'],
-            'current' => $result['data']['current'],
-            'power' => $result['data']['power'],
-            'duration'=>$result['data']['duration']
-        ];
+
     }
     public function endCharging($deviceId){
         $url = config('DevServer.ServerUrl') . config('DevServer.ServerApiName')['setChargerEnd'];

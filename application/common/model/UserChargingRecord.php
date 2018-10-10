@@ -10,6 +10,7 @@ namespace app\common\model;
 
 
 use app\api\service\Wechat;
+use app\lib\exception\ChargerInfoException;
 use app\lib\exception\NotFoundException;
 use app\lib\exception\SqlException;
 use EasyWeChat\Factory;
@@ -43,14 +44,13 @@ class UserChargingRecord extends Model
     }
 
     /**
-     * 从之前的缓存中找到唯一的充电但单号 consumeNumber
+     * 从之前的缓存中找到唯一的充电单号 consumeNumber
      * 更新用户充电记录
      * @param $userId 用户 ID
      */
     public function updateChargingRecord($userId,$energy,$duration)
     {
-
-        $consumeNumber=$this->getConsumeNumber($userId)['consume_number'];
+        $consumeNumber=$this->getChargingCacheInfo($userId)['consume_number'];
         $this->where('consume_number',$consumeNumber)->update([
             'duration'=>$duration,
             'energy'=>$energy
@@ -93,11 +93,17 @@ class UserChargingRecord extends Model
     public function settleCharging($deviceId,$userId,$energy,$endType)
     {
         // 获取缓存中的信息
-        $consumeInfo= $this->getConsumeNumber($userId);
+        $consumeInfo= $this->getChargingCacheInfo($userId);
         $chargingRecord = $this->where(['consume_number'=>$consumeInfo['consume_number']])->find();
         if(!$chargingRecord){
             throw new NotFoundException([
                 'errMsg'=>'订单不存在'
+            ]);
+        }
+        // 如果该记录已经结算过
+        if($chargingRecord['record_status']){
+            throw new ChargerInfoException([
+                'errMsg'=>'订单已结算'
             ]);
         }
         // 调用充电信息模型计算所需花费
@@ -108,6 +114,7 @@ class UserChargingRecord extends Model
             'energy_money'=>$consumeMoney['energyMoney'],
             'service_money'=>$consumeMoney['serviceMoney'],
             'end_type'=>$endType,
+            'record_status'=>1,
             'end_time'=> date('Y-m-d H:i:s')
         ]);
         // 调用 UserInfo 模型同步更新账户余额,更新用户当前状态为未充电
@@ -116,7 +123,6 @@ class UserChargingRecord extends Model
             'pay'=>$pay-($consumeMoney['energyMoney']+$consumeMoney['serviceMoney']),
             'is_charging'=>0
         ]);
-
         // 向用户推送
         $openId = UserInfo::where('id',$userId)->value('open_id');
         $result = (new Wechat())->notifyTemplate(Wechat::TEMPLATE_CONSUME,[
@@ -133,13 +139,13 @@ class UserChargingRecord extends Model
         }
     }
     /**
-     * 获取订单号
+     * 获取缓存信息
      */
-    private function getConsumeNumber($userId) {
+    private function getChargingCacheInfo($userId) {
         $cacheInfo = Cache::get($userId);
         if(!$cacheInfo) {
             throw new NotFoundException([
-                'errMsg'=>'当前并没有充电订单'
+                'errMsg'=>'充电订单缓存已失效'
             ]);
         } else {
             return  $cacheInfo;
