@@ -141,7 +141,7 @@ class UserChargingRecord extends Model
     /**
      * 获取缓存信息
      */
-    private function getChargingCacheInfo($userId) {
+    public function getChargingCacheInfo($userId) {
         $cacheInfo = Cache::get($userId);
         if(!$cacheInfo) {
             throw new NotFoundException([

@@ -151,13 +151,13 @@ class ChargerInfo extends Model
             'userId'=>intval($userId),
             'type'=>intval($type),
             'time'=>intval($chargingInfo['time']),
-            'energy'=>floatval($chargingInfo['energy'])
+            'energy'=>intval($chargingInfo['energy'])
         ];
         $result = sendCommand($url, POST, $data);
         if($result['data']['respCode']!==100){
             throw new ChargerInfoException([
                 'respCode'=>60002,
-                'errMsg'=> '设备开启失败'
+                'errMsg'=> '设备暂无法开启，稍后再试'
             ]);
         }
         return $data;
@@ -218,9 +218,10 @@ class ChargerInfo extends Model
         // 如果获取充电信息失败了,那么需要服务器进行结算
         if($result['data']['respCode']!==100){
             // 获取充电订单缓存信息
-            $cacheInfo = model('UserChargingRecord')->getChargingCacheInfo($userId);
+            $userChargingRecord = new UserChargingRecord();
+            $cacheInfo = $userChargingRecord->getChargingCacheInfo($userId);
             // 获取订单存入数据库的最后一条记录
-            $chargingRecord = model('UserChargingRecord')->where(['consume_number'=>$cacheInfo['consume_number']])->find();
+            $chargingRecord = $userChargingRecord->where(['consume_number'=>$cacheInfo['consume_number']])->find();
             if(!$chargingRecord){
                 throw new NotFoundException([
                             'errMsg'=>'数据库充电订单不存在'
