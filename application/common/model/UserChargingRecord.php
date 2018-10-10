@@ -145,7 +145,7 @@ class UserChargingRecord extends Model
         $cacheInfo = Cache::get($userId);
         if(!$cacheInfo) {
             throw new NotFoundException([
-                'errMsg'=>'充电订单缓存已失效'
+                'errMsg'=>'订单已结算'
             ]);
         } else {
             return  $cacheInfo;

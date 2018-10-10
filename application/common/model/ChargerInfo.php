@@ -151,7 +151,7 @@ class ChargerInfo extends Model
             'userId'=>intval($userId),
             'type'=>intval($type),
             'time'=>intval($chargingInfo['time']),
-            'energy'=>intval($chargingInfo['energy'])
+            'energy'=>floatval($chargingInfo['energy'])
         ];
         $result = sendCommand($url, POST, $data);
         if($result['data']['respCode']!==100){
@@ -217,7 +217,6 @@ class ChargerInfo extends Model
         // 当前充电信息异常,  可能导致无法推送
         // 如果获取充电信息失败了,那么需要服务器进行结算
         if($result['data']['respCode']!==100){
-            // 进行结算
             // 获取充电订单缓存信息
             $cacheInfo = model('UserChargingRecord')->getChargingCacheInfo($userId);
             // 获取订单存入数据库的最后一条记录
@@ -230,7 +229,7 @@ class ChargerInfo extends Model
             // 进行结算
             model('UserChargingRecord')->settleCharging($deviceId, $userId, $chargingRecord['energy'], $chargingRecord['charging_type']);
             throw new ChargerInfoException([
-                'errMsg' => '设备已离线'
+                'errMsg' => '设备已停止充电'
             ]);
         }else{
             return [
