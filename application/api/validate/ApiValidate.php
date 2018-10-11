@@ -5,7 +5,7 @@ namespace app\api\validate;
 class ApiValidate extends BaseValidate{
     protected $rule = [
         ['openId','require|isNotEmpty'],
-        ['rechargeMoney','require|isNotEmpty'],
+        ['rechargeMoney','require|isNotEmpty|isPositiveInteger'],
         ['userId','require|isPositiveInteger'],
         ['password','require|isNotEmpty'],
         ['phone','require|isMobile'],
@@ -17,6 +17,7 @@ class ApiValidate extends BaseValidate{
         ['value','require'],
         ['payType','require'],
         ['content','require'],
+        ['money','require'],
         ['tag','require'],
         ['deviceId','require|isPositiveInteger'],
     ];
@@ -38,5 +39,6 @@ class ApiValidate extends BaseValidate{
         'modifydatum'=>['phone','msgId','userName','userId','verfCode'],
         'logout'=>['msgId','userId'],
         'allChargerInfo'=>['msgId','userId'],
+        'withDraw'=>['msgId','userId','phone','money','verfCode','openId'],
     ];
 }

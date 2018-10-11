@@ -43,7 +43,6 @@ class UserInfo extends Model
             ]);
         }
     }
-
     /**
      *
      * 检查验证码是否正确
@@ -137,6 +136,7 @@ class UserInfo extends Model
                 'userId'=>$userInfo['id'],
                 'userName'=>$userInfo['user_name'],
                 'balance'=>$userInfo['pay'],
+                'freeze'=>$userInfo['freeze'],
                 'phone'=>$userInfo['phone'],
                 'openId'=>$userInfo['open_id'],
                 'isCharging'=>$userInfo['is_charging'],
@@ -150,6 +150,7 @@ class UserInfo extends Model
                 'userId' => $userInfo['id'],
                 'userName' => $userInfo['user_name'],
                 'balance' => $userInfo['pay'],
+                'freeze'=>$userInfo['freeze'],
                 'phone' => $userInfo['phone'],
                 'openId' => $userInfo['open_id'],
                 'isCharging' => $userInfo['is_charging'],
@@ -157,6 +158,12 @@ class UserInfo extends Model
             return $data;
         }
     }
+
+    /**
+     * 保存数据
+     * @param $data
+     * @return false|int
+     */
     public function add($data){
         return $this->save($data);
     }
@@ -176,6 +183,16 @@ class UserInfo extends Model
            ]);
        }
     }
+
+    /**
+     * 更改用户资料
+     * @param $userId
+     * @param $phone
+     * @param $userName
+     * @return array
+     * @throws Exception
+     * @throws UserInfoException
+     */
     public function modifyDatum($userId,$phone,$userName){
             $oldPhone = self::where('id',$userId)->value('phone');
             $oldUserName = self::where('id',$userId)->value('user_name');

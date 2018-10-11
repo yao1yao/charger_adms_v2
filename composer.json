@@ -41,6 +41,7 @@
     },
     "scripts":{
         "cm1": "scripts/init_sql.sh scripts/table/EV_user_recharge_record.sql",
+        "cm2": "scripts/init_sql.sh scripts/table/EV_user_withdraw_record.sql",
         "cb": "scripts/create_table.sh scripts/table/EV_user_recharge_record.sql",
         "cb1": "scripts/create_table.sh scripts/table/EV_charger_info.sql",
         "cb2": "scripts/create_table.sh scripts/table/EV_charger_owner_info.sql",
@@ -53,6 +54,7 @@
         "cb9": "scripts/create_table.sh scripts/table/EV_user_info.sql",
         "cb10": "scripts/create_table.sh scripts/table/EV_charger_bill_model.sql",
         "cb11": "scripts/create_table.sh scripts/table/EV_user_recharge_record.sql",
+        "cb12": "scripts/create_table.sh scripts/table/EV_user_withdraw_record.sql",
         "natapp": "nohup natapp -authtoken=dce612355b6e8926 -log=stdout &",
         "findnat": "ps -ef|grep natapp",
         "killnat": "kill -9 pid",
