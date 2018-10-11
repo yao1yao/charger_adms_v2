@@ -52,7 +52,7 @@ class Wechat extends Controller
                     }else{
                         // 如果用户未在充电中
                         if($result['is_charging']===0){
-                            $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/home');
+                            $this->redirect(config('Host.domain') . 'static/app_v1/index.html#/charger');
                         // 如果用户在充电中
                         }else{
                             // 获取缓存的信息
