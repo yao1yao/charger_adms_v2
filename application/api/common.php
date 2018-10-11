@@ -12,6 +12,10 @@ define('POST',1);
 define('CHARGING_TYPE_MONEY',0);
 define('CHARGING_TYPE_TIME',1);
 
+// 充电支付方式
+define('PAY_TYPE_WECHAT',1);
+define('PAY_TYPE_BALANCE',2);
+
 //返回前端数据格式
 function respSuccess($data=[]){
     return json(array_merge($data,[

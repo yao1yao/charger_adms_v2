@@ -19,8 +19,10 @@ class Startcharging extends BaseController
         $data = $this->ApiValidate->goCheck('startCharging');
         // 估计需要花费的金额
         $currentSpendMoney = $this->ChargerInfoModel->estimateMoney($data['chargerNumber'],$data['type'],$data['value']);
-        // 判断余额是否足够
-        $this->UserInfoModel->isBalanceEnough($data['userId'],$currentSpendMoney);
+        // 如果是余额支付的充电方式,需要判断余额是否足够
+        if($data['payType']==PAY_TYPE_BALANCE) {
+            $this->UserInfoModel->isBalanceEnough($data['userId'], $currentSpendMoney);
+        }
         // 开始充电，未开启返回失败
         $chargingInfo = $this->ChargerInfoModel->startCharging($data['userId'],$data['chargerNumber'],$data['type'],$data['value']);
         /**

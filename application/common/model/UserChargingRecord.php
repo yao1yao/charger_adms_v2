@@ -59,6 +59,7 @@ class UserChargingRecord extends Model
     public function getChargerRecord($userId){
         $chargerRecord = $this->where(['user_id'=>$userId])
             ->whereTime('start_time','month')
+            ->where('record_status',1)
             ->field('user_id,set_duration,set_energy,end_type,charging_type,consume_number',true)
             ->order('id','desc')
             ->select();

@@ -224,7 +224,7 @@ class ChargerInfo extends Model
             $chargingRecord = $userChargingRecord->where(['consume_number'=>$cacheInfo['consume_number']])->find();
             if(!$chargingRecord){
                 throw new NotFoundException([
-                            'errMsg'=>'数据库充电订单不存在'
+                            'errMsg'=>'充电订单已失效'
                 ]);
             }
             // 进行结算
