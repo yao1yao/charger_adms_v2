@@ -21,6 +21,7 @@ class BaseController extends Controller
     public $UserChargingRecordModel;
     public $UserFeedbackModel;
     public $DeviceNotifyInfoModel;
+    public $UserWithdrawRecordModel;
     public $ApiValidate;
 
 
@@ -33,6 +34,7 @@ class BaseController extends Controller
         $this->UserChargingRecordModel=model('UserChargingRecord');
         $this->UserFeedbackModel=model('UserFeedback');
         $this->DeviceNotifyInfoModel=model('DeviceNotifyInfo');
+        $this->UserWithdrawRecordModel=model('UserWithdrawRecord');
         $this->ApiValidate = new ApiValidate();
     }
 }

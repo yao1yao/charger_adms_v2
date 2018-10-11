@@ -32,7 +32,13 @@ function chargerBack($respCode,$data=[]){
 }
 
 //构造唯一订单
-function generateOrderNumber($type){
+/**
+ * 生成提现订单号
+ * 订单号 = 月日时分秒(10)+随机码(4)+88
+ * @param int $type 执行随机订单号类型
+ * @return string 返回订单号
+ */
+function generateOrderNumber($type=88){
     return date("mdHis") . sprintf("%04d", mt_rand(0, 9999)) . sprintf("%02d", $type);
 }
 

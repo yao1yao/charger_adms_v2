@@ -16,15 +16,10 @@ class Getnewestbalance extends BaseController
     public function command(){
         $data = $this->ApiValidate->goCheck('getNewestBalance');
 
-        $balance = $this->UserInfoModel->where('id',$data['userId'])->column('pay')[0];
-        if(!$balance){
-            throw new UserInfoException([
-                'errMsg'=>'用户暂无充值',
-                'respCode'=>40004
-            ]);
-        }
+        $balance = $this->UserInfoModel->where('id',$data['userId'])->value('pay');
+        $freeze = $this->UserInfoModel->where('id',$data['userId'])->value('freeze');
         // 返回该用户的最新余额
-        return chargerBack(100,['balance'=>$balance]);
+        return chargerBack(100,['balance'=>$balance,'freeze'=>$freeze]);
 
     }
 }
