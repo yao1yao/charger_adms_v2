@@ -21,7 +21,7 @@ class UserRechargeRecord extends Model
             'body'=>'Charging pile payment',
             'attach'=>$data['userId'], // 附加信息为 userId
             'out_trade_no'=>$this->generateOrderNumber(),
-            'total_fee'=>$data['rechargeMoney'],
+            'total_fee'=>$data['rechargeMoney']*100,
             'trade_type'=>'JSAPI',
             'openid'=>$data['openId'],
             //此处采用内网穿透进行本地调试,所以 ip 必须赋值为外网 ip 地址

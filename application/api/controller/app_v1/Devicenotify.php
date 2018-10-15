@@ -17,12 +17,8 @@ class Devicenotify extends BaseController
         if ($info['apiName'] != 'notifyEndCharging') {
             return "Incorrect apiName";
         }
-        $deviceId = intval($info['deviceId']);
-        $userId = intval($info['userId']);
-        $energy = $info['energy'];
-        $endType = $info['endType'];
         // 结束充电后，计算所需花费，更新充电记录与账户余额, 推送信息给用户
-        $this->UserChargingRecordModel->settleCharging($deviceId,$userId,$energy,$endType);
+        $this->UserChargingRecordModel->settleCharging($info['deviceId'],$info['userId'],$info['energy'],$info['duration'],$info['endType']);
         return json(['repsCode'=>100]);
     }
 }

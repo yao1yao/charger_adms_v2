@@ -19,7 +19,12 @@ class Endcharging extends BaseController
         $chargingInfo = $this->ChargerInfoModel->endCharging($deviceId);
         // 如果还在充电中，需要继续更新记录
         if($chargingInfo['isCharging']){
-            $this->UserChargingRecordModel->updateChargingRecord($data['userId'],$chargingInfo['energy'],$chargingInfo['duration']);
+            $consumeNumber = $this->UserChargingRecordModel->getChargingCacheInfo($data['userId']);
+            $updateRecord=[
+                'energy'=>$chargingInfo['energy'],
+                'duration'=>$chargingInfo['duration']
+            ];
+            $this->UserChargingRecordModel->updateChargingRecord($consumeNumber['consume_number'],$updateRecord);
         }
         // 结束成功更新用户状态
         $this->UserInfoModel->isUpdate(true)->save(['is_charging'=>0], ['id' => $data['userId']]);

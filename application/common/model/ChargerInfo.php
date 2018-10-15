@@ -216,9 +216,9 @@ class ChargerInfo extends Model
         $result = sendCommand($url, POST, $data);
         // 当前充电信息异常,  可能导致无法推送
         // 如果获取充电信息失败了,那么需要服务器进行结算
+        $userChargingRecord = new UserChargingRecord();
         if($result['data']['respCode']!==100){
             // 获取充电订单缓存信息
-            $userChargingRecord = new UserChargingRecord();
             $cacheInfo = $userChargingRecord->getChargingCacheInfo($userId);
             // 获取订单存入数据库的最后一条记录
             $chargingRecord = $userChargingRecord->where(['consume_number'=>$cacheInfo['consume_number']])->find();
@@ -228,7 +228,7 @@ class ChargerInfo extends Model
                 ]);
             }
             // 进行结算
-            model('UserChargingRecord')->settleCharging($deviceId, $userId, $chargingRecord['energy'], $chargingRecord['charging_type']);
+            $userChargingRecord->settleCharging($deviceId, $userId, $chargingRecord['energy'],0, $chargingRecord['charging_type']);
             throw new ChargerInfoException([
                 'errMsg' => '设备已停止充电'
             ]);

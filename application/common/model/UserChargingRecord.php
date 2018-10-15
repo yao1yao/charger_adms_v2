@@ -15,6 +15,8 @@ use app\lib\exception\NotFoundException;
 use app\lib\exception\SqlException;
 use EasyWeChat\Factory;
 use think\Cache;
+use think\Exception;
+use think\Log;
 use think\Model;
 
 class UserChargingRecord extends Model
@@ -43,19 +45,6 @@ class UserChargingRecord extends Model
         return Cache::set($userId,$data);
     }
 
-    /**
-     * 从之前的缓存中找到唯一的充电单号 consumeNumber
-     * 更新用户充电记录
-     * @param $userId 用户 ID
-     */
-    public function updateChargingRecord($userId,$energy,$duration)
-    {
-        $consumeNumber=$this->getChargingCacheInfo($userId)['consume_number'];
-        $this->where('consume_number',$consumeNumber)->update([
-            'duration'=>$duration,
-            'energy'=>$energy
-        ]);
-    }
     public function getChargerRecord($userId){
         $chargerRecord = $this->where(['user_id'=>$userId])
             ->whereTime('start_time','month')
@@ -90,8 +79,32 @@ class UserChargingRecord extends Model
             'sumEnergy'=>$sumEnergy
         ];
     }
+    /**
+     * 从之前的缓存中找到唯一的充电单号 consumeNumber
+     * 更新用户充电记录
+     * @param $data array 更新记录的最新数据
+     *
+     */
+    public function updateChargingRecord($consumeNumber,$data=[])
+    {
+       $this->where('consume_number',$consumeNumber)->update($data);
+    }
     // 充电结束后，进行结算
-    public function settleCharging($deviceId,$userId,$energy,$endType)
+
+    /**
+     * 进行结算和推送
+     * @param $deviceId int 当前设备 ID
+     * @param $userId   int 当前用户
+     * @param $energy   int 充电度数
+     * @param int $duration int 充电时长, 为 0 表示刚开始充电就结束或者设备故障无法推送的标志, 其余值为正常充了多少度电
+     * @param $endType  int 充电结束类型
+     * @throws ChargerInfoException
+     * @throws NotFoundException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function settleCharging($deviceId,$userId,$energy,$duration=0,$endType)
     {
         // 获取缓存中的信息
         $consumeInfo= $this->getChargingCacheInfo($userId);
@@ -108,19 +121,36 @@ class UserChargingRecord extends Model
             ]);
         }
         // 调用充电信息模型计算所需花费
-        $consumeMoney = model('ChargerInfo')->calculateConsume($deviceId,$energy);
-        // 更新记录
-        $this->where('consume_number',$consumeInfo['consume_number'])->update([
+        $consumeMoney = (new ChargerInfo())->calculateConsume($deviceId,$energy);
+
+        // 更新记录, 正常推送结束
+        $newestRecord=[
             'energy'=>$energy,
             'energy_money'=>$consumeMoney['energyMoney'],
             'service_money'=>$consumeMoney['serviceMoney'],
             'end_type'=>$endType,
             'record_status'=>1,
+            'duration'=>0,
             'end_time'=> date('Y-m-d H:i:s')
-        ]);
+        ];
+        if($duration==0){
+            //如果是设备故障导致的无法推送,那么就是当前时间减去充电开始时间进行更新
+            //获取结束时间到开始时间的时间戳
+            //如果刚开始充电又结束，那么充电时间也为零
+            $second = strtotime(date('Y-m-d H:i:s'))-strtotime($chargingRecord['start_time']);
+            $minutes = $second/60;
+            // 获取最新的持续时间
+            $newestRecord['duration']=$minutes;
+        }else{
+            // 否则使用设备推送的时间进行更新
+            $newestRecord['duration']=$duration;
+        }
+        // 更新记录
+        $this->updateChargingRecord($consumeInfo['consume_number'],$newestRecord);
+
         // 调用 UserInfo 模型同步更新账户余额,更新用户当前状态为未充电
         $pay = UserInfo::where('id',$userId)->value('pay');
-        model('UserInfo')->where('id',$userId)->update([
+        UserInfo::where('id',$userId)->update([
             'pay'=>$pay-($consumeMoney['energyMoney']+$consumeMoney['serviceMoney']),
             'is_charging'=>0
         ]);
@@ -131,7 +161,7 @@ class UserChargingRecord extends Model
             'consumeNumber'=>$chargingRecord['consume_number'],
             'chargerNumber'=>$chargingRecord['charger_number'],
             'startTime'=>$chargingRecord['start_time'],
-            'duration'=>$chargingRecord['duration'],
+            'duration'=>round($newestRecord['duration'],1),
             'fee'=>$consumeMoney['energyMoney']+$consumeMoney['serviceMoney']
         ],$openId);
         // 推送成功删除缓存
