@@ -176,7 +176,7 @@ class Wechat extends Controller
                 if($message['result_code']==='SUCCESS'){
                     $updateOrder=[
                         'recharge_status'=>1,
-                        'recharge_money' => $message['cash_fee'],
+                        'recharge_money' => $message['cash_fee']/100,
                         'transaction_id' => $message['transaction_id']
                     ];
                 }elseif($message['result_code']=== 'FAIL'){

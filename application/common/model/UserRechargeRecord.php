@@ -82,10 +82,10 @@ class UserRechargeRecord extends Model
             ->order('recharge_time','desc')
             ->select();
         // 总共充值的钱
-        $sumRechargeMoney = $this->where(['user_id'=>$userId])->sum('recharge_money');
+        $sumRechargeMoney = $this->where(['user_id'=>$userId])->where('recharge_status','>',0)->sum('recharge_money');
         // 总共充电花费的钱
-        $energyMoney = model('UserChargingRecord')->where(['user_id'=>$userId])->sum('energy_money');
-        $serviceMoney = model('UserChargingRecord')->where(['user_id'=>$userId])->sum('service_money');
+        $energyMoney = model('UserChargingRecord')->where('record_status','>',0)->where(['user_id'=>$userId])->sum('energy_money');
+        $serviceMoney = model('UserChargingRecord')->where(['user_id'=>$userId])->where('record_status','>',0)->sum('service_money');
         // 用户所剩余额, 暂时不返回，在登录时已经返回过余额
 //      $payMoney = self::get(['user_id'=>$userId])->userInfo->pay;
         return [

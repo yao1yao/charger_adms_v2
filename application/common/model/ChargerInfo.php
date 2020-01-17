@@ -47,7 +47,7 @@ class ChargerInfo extends Model
         $chargerInfo = $this->where($data)->find();
         if(!$chargerInfo){
             throw new NotFoundException([
-                'errMsg'=>'设备不存在'
+                'errMsg'=>'设备不存在,请勿支付充电'
             ]);
         }
         // 检查设备当前是否可用
@@ -81,33 +81,33 @@ class ChargerInfo extends Model
         }
         if ($result['data']['respCode'] !== 100) {
             throw new ChargerException([
-                'errMsg' => '当前设备暂不可用'
+                'errMsg' => '设备暂不可用,请勿支付充电'
             ]);
         }
         if ($result['data']['connect'] === 0) {
             throw new ChargerException([
-                'errMsg' => '充电枪未连接'
+                'errMsg' => '充电枪未连接,请勿支付充电'
             ]);
         }
         switch($result['data']['status']){
             case 0:
                 throw new ChargerException([
-                    'errMsg' => '充电桩已离线'
+                    'errMsg' => '充电桩已离线,请勿支付充电'
                 ]);
                 break;
             case 2:
                 throw new ChargerException([
-                    'errMsg' => '充电桩正在充电中'
+                    'errMsg' => '充电桩正充电中,请勿支付充电'
                 ]);
                 break;
             case 3:
                 throw new ChargerException([
-                    'errMsg' => '充电桩已预约'
+                    'errMsg' => '电桩已预约,请勿支付充电'
                 ]);
                 break;
             case 16400:
                 throw new ChargerException([
-                    'errMsg' => '电表异常'
+                    'errMsg' => '电表读取异常,请勿支付充电'
                 ]);
                 break;
         }

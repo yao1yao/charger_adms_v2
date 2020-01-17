@@ -149,7 +149,6 @@ class ChargerInfo extends Controller
     }
 
     public function qcord(){
-
         return $this->fetch();
     }
 }
